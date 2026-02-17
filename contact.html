@@ -1,0 +1,172 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Contact — Mayuri Indian Restaurant</title>
+        <link rel="icon" href="images/Mayuri_logo.png" type="image/png" />
+<link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="site-header"></div>
+    <main>
+      <div id="top"></div>
+      <section class="section section--contact" id="contact-form">
+        <div class="contact-panel">
+          <div class="contact-accent"></div>
+          <div class="contact-grid">
+            <div class="contact-info">
+              <img class="contact-image" src="images/lunch_buffet.png" alt="Catering spread" />
+              <h3>Catering in Northern Virginia</h3>
+              <p class="contact-blurb">Tell us about your event and we’ll respond within 24 hours with menu guidance and next steps.</p>
+              <p class="contact-meta">390 Elden St, Herndon, VA 20170</p>
+              <p class="contact-meta"><a href="tel:7039557588">(703) 955-7588</a></p>
+            </div>
+            <div class="contact-form-wrap">
+              <div class="section__head">
+                <span class="eyebrow">Get in Touch</span>
+                <h2>Contact &amp; Catering Requests</h2>
+                <p class="contact-subtext">Tell us about your event and we’ll respond within 24 hours.</p>
+              </div>
+              <div class="form-status" id="form-status" role="status" aria-live="polite"></div>
+              <form class="contact-form" id="contact-form-element">
+                <input type="hidden" name="form_started" id="form-started" value="" />
+                <div class="field">
+                  <label for="contact-name">Name</label>
+                  <input id="contact-name" type="text" name="name" required />
+                </div>
+                <div class="field">
+                  <label for="contact-phone">Phone</label>
+                  <input id="contact-phone" type="tel" name="phone" required />
+                </div>
+                <div class="field">
+                  <label for="contact-email">Email</label>
+                  <input id="contact-email" type="email" name="email" required />
+                </div>
+                <div class="field">
+                  <label for="contact-date">Event Date</label>
+                  <input id="contact-date" type="date" name="eventDate" />
+                </div>
+                <div class="field">
+                  <label for="contact-guests">Number of Guests</label>
+                  <input id="contact-guests" type="number" name="guestCount" />
+                </div>
+                <div class="field">
+                  <label for="contact-type">Event Type</label>
+                  <select id="contact-type" name="eventType">
+                    <option>Wedding</option>
+                    <option>Corporate</option>
+                    <option>Birthday</option>
+                    <option>Private Event</option>
+                  </select>
+                </div>
+                <div class="field field--full">
+                  <label for="contact-message">Message</label>
+                  <textarea id="contact-message" name="message" rows="5" required></textarea>
+                </div>
+                <div class="field field--full captcha-field">
+                  <label for="contact-captcha">Spam Check: What is 5 + 3?</label>
+                  <input id="contact-captcha" type="text" name="captcha" inputmode="numeric" autocomplete="off" required />
+                  <small class="field-help">Please answer the simple math question to help us prevent spam.</small>
+                </div>
+                <div class="field field--full honeypot">
+                  <label for="company-website">Company Website</label>
+                  <input id="company-website" type="text" name="company_website" autocomplete="off" tabindex="-1" />
+                </div>
+                <div class="field field--full form-actions">
+                  <button class="btn btn--primary" type="submit" id="submit-button">
+                    <span class="btn-text">Submit Request</span>
+                    <span class="spinner" aria-hidden="true"></span>
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+    <div class="modal modal--small" id="thank-you-modal" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="modal__backdrop" data-modal-close></div>
+      <div class="modal__content" role="document">
+        <div class="modal__header">
+          <h3>Thank you!</h3>
+          <button class="modal__close" type="button" data-modal-close aria-label="Close dialog">×</button>
+        </div>
+        <p>Your request has been sent successfully. We’ll contact you within 24 hours.</p>
+        <button class="btn btn--primary" type="button" data-modal-close>Close</button>
+      </div>
+    </div>
+    <div id="site-footer"></div>
+    <script src="assets/js/layout.js" defer></script>
+    <script>
+      (function () {
+        const form = document.getElementById('contact-form-element');
+        const status = document.getElementById('form-status');
+        const submitButton = document.getElementById('submit-button');
+        const startedField = document.getElementById('form-started');
+        const modal = document.getElementById('thank-you-modal');
+        const closeButtons = modal.querySelectorAll('[data-modal-close]');
+
+        function setStatus(type, message) {
+          status.className = `form-status ${type}`;
+          status.textContent = message;
+        }
+
+        function openModal() {
+          modal.classList.add('is-open');
+          modal.setAttribute('aria-hidden', 'false');
+          history.replaceState(null, '', '#thank-you');
+        }
+
+        function closeModal() {
+          modal.classList.remove('is-open');
+          modal.setAttribute('aria-hidden', 'true');
+          if (location.hash === '#thank-you') {
+            history.replaceState(null, '', location.pathname + location.search);
+          }
+        }
+
+        closeButtons.forEach((btn) => btn.addEventListener('click', closeModal));
+
+        if (location.hash === '#thank-you') {
+          openModal();
+        }
+
+        startedField.value = Date.now().toString();
+
+        form.addEventListener('submit', async (event) => {
+          event.preventDefault();
+          status.textContent = '';
+          submitButton.disabled = true;
+          submitButton.classList.add('is-loading');
+
+          const formData = new FormData(form);
+          const payload = Object.fromEntries(formData.entries());
+
+          try {
+            const res = await fetch('/api/contact.php', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(payload),
+            });
+            const data = await res.json();
+
+            if (data.success) {
+              setStatus('success', 'Thank you! Your request has been sent successfully.');
+              form.reset();
+              startedField.value = Date.now().toString();
+              openModal();
+            } else {
+              setStatus('error', data.message || 'Something went wrong. Please try again or call us at (703) 955-7588.');
+            }
+          } catch (err) {
+            setStatus('error', 'Something went wrong. Please try again or call us at (703) 955-7588.');
+          } finally {
+            submitButton.disabled = false;
+            submitButton.classList.remove('is-loading');
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

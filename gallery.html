@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Gallery — Mayuri Indian Restaurant</title>
+        <link rel="icon" href="images/Mayuri_logo.png" type="image/png" />
+<link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="site-header"></div>
+    <main>
+      <section class="section section--gallery">
+        <div class="section__head">
+          <h2>Gallery</h2>
+          <p>A glimpse of our signature dishes, buffet spread, and restaurant favorites.</p>
+        </div>
+        <div class="gallery-grid" id="gallery-grid">
+          <button class="gallery-tile" type="button">
+            <img src="images/gallery/biryani.png" alt="Chicken biryani" loading="lazy" />
+          </button>
+          <button class="gallery-tile" type="button">
+            <img src="images/gallery/butter-chicken.png" alt="Butter chicken" loading="lazy" />
+          </button>
+          <button class="gallery-tile" type="button">
+            <img src="images/gallery/thali.png" alt="Indian thali platter" loading="lazy" />
+          </button>
+          <button class="gallery-tile" type="button">
+            <img src="images/gallery/tandoori-chicken.png" alt="Tandoori chicken" loading="lazy" />
+          </button>
+        </div>
+      </section>
+    </main>
+    <div class="modal" id="gallery-lightbox" aria-hidden="true" role="dialog" aria-modal="true">
+      <div class="modal__backdrop" data-lightbox-close></div>
+      <div class="modal__content gallery-lightbox__content" role="document">
+        <div class="modal__header">
+          <button class="modal__close" type="button" data-lightbox-close aria-label="Close dialog">×</button>
+        </div>
+        <button class="gallery-lightbox__nav gallery-lightbox__prev" type="button" aria-label="Previous image">‹</button>
+        <img class="gallery-lightbox__image" alt="" />
+        <button class="gallery-lightbox__nav gallery-lightbox__next" type="button" aria-label="Next image">›</button>
+      </div>
+    </div>
+    <div id="site-footer"></div>
+    <script src="assets/js/layout.js" defer></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        const grid = document.getElementById("gallery-grid");
+        if (!grid) return;
+
+        const normalizeSrc = (src) => {
+          const raw = (src || "").trim();
+          if (!raw) return "";
+          try {
+            const url = new URL(raw, window.location.href);
+            return url.pathname.replace(/\\/+/g, "/").toLowerCase();
+          } catch (err) {
+            return raw.split("?")[0].toLowerCase();
+          }
+        };
+
+        const seen = new Set();
+        const tiles = Array.from(grid.querySelectorAll(".gallery-tile"));
+
+        tiles.forEach((tile) => {
+          const img = tile.querySelector("img");
+          if (!img) {
+            tile.remove();
+            return;
+          }
+
+          const normalized = normalizeSrc(img.getAttribute("src"));
+          if (!normalized || seen.has(normalized)) {
+            tile.remove();
+            return;
+          }
+
+          seen.add(normalized);
+          img.onerror = () => tile.remove();
+          img.onload = () => tile.classList.add("is-loaded");
+        });
+
+        const lightbox = document.getElementById("gallery-lightbox");
+        if (!lightbox) return;
+
+        const lightboxImage = lightbox.querySelector(".gallery-lightbox__image");
+        const closeButtons = lightbox.querySelectorAll("[data-lightbox-close]");
+        const prevButton = lightbox.querySelector(".gallery-lightbox__prev");
+        const nextButton = lightbox.querySelector(".gallery-lightbox__next");
+        let activeIndex = 0;
+
+        const activeTiles = () => Array.from(grid.querySelectorAll(".gallery-tile"));
+
+        const openLightbox = (index) => {
+          const tiles = activeTiles();
+          if (!tiles[index]) return;
+          const img = tiles[index].querySelector("img");
+          if (!img) return;
+          lightboxImage.src = img.src;
+          lightboxImage.alt = img.alt || "Gallery image";
+          activeIndex = index;
+          lightbox.classList.add("is-open");
+          lightbox.setAttribute("aria-hidden", "false");
+        };
+
+        const closeLightbox = () => {
+          lightbox.classList.remove("is-open");
+          lightbox.setAttribute("aria-hidden", "true");
+          lightboxImage.src = "";
+        };
+
+        grid.addEventListener("click", (event) => {
+          const tile = event.target.closest(".gallery-tile");
+          if (!tile) return;
+          const tiles = activeTiles();
+          const index = tiles.indexOf(tile);
+          if (index >= 0) openLightbox(index);
+        });
+
+        closeButtons.forEach((btn) => btn.addEventListener("click", closeLightbox));
+
+        prevButton.addEventListener("click", () => {
+          const tiles = activeTiles();
+          if (!tiles.length) return;
+          activeIndex = (activeIndex - 1 + tiles.length) % tiles.length;
+          openLightbox(activeIndex);
+        });
+
+        nextButton.addEventListener("click", () => {
+          const tiles = activeTiles();
+          if (!tiles.length) return;
+          activeIndex = (activeIndex + 1) % tiles.length;
+          openLightbox(activeIndex);
+        });
+
+        document.addEventListener("keydown", (event) => {
+          if (!lightbox.classList.contains("is-open")) return;
+          if (event.key === "Escape") closeLightbox();
+          if (event.key === "ArrowLeft") prevButton.click();
+          if (event.key === "ArrowRight") nextButton.click();
+        });
+      });
+    </script>
+  </body>
+</html>

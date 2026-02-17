@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Order Online — Mayuri Indian Restaurant</title>
+        <link rel="icon" href="images/Mayuri_logo.png" type="image/png" />
+<link rel="stylesheet" href="styles.css" />
+    <style>
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        display: flex;
+        flex-direction: column;
+      }
+
+      .order-frame {
+        flex: 1;
+        min-height: 0;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .order-frame iframe {
+        flex: 1;
+        width: 100%;
+        border: 0;
+      }
+
+      .order-fallback {
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 24px 6vw 28px;
+        text-align: center;
+      }
+
+      .order-fallback.is-visible {
+        display: flex;
+      }
+
+      .order-fallback__panel {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 24px;
+        max-width: 520px;
+        width: 100%;
+        box-shadow: 0 16px 36px rgba(0, 0, 0, 0.12);
+      }
+
+      .order-fallback__panel h2 {
+        margin-bottom: 8px;
+      }
+
+      .order-fallback__panel p {
+        margin-bottom: 16px;
+        color: var(--muted);
+      }
+
+      .order-fallback__actions {
+        display: flex;
+        gap: 12px;
+        justify-content: center;
+        flex-wrap: wrap;
+      }
+
+      .order-fallback__link {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 16px;
+        border-radius: 999px;
+        border: 1px solid var(--border);
+        color: var(--brand);
+        text-decoration: none;
+      }
+
+      .order-loading {
+        text-align: center;
+        padding: 8px 0 16px;
+        font-size: 0.95rem;
+        color: var(--muted);
+      }
+    </style>
+  </head>
+  <body>
+    <div id="site-header"></div>
+
+    <main class="order-frame">
+      <div class="order-loading" id="order-loading">Loading online ordering…</div>
+      <iframe
+        id="order-iframe"
+        src="https://order.toasttab.com/online/mayuri-indian-restaurant-390-elden-street"
+        title="Order Online from Mayuri Indian Restaurant"
+        loading="lazy"
+        referrerpolicy="no-referrer-when-downgrade"
+      ></iframe>
+      <div class="order-fallback" id="order-fallback" aria-live="polite">
+        <div class="order-fallback__panel">
+          <h2>Order Online</h2>
+          <p>Pickup &amp; delivery powered by Toast</p>
+          <div class="order-fallback__actions">
+            <a class="btn btn--primary btn--saffron" href="https://order.toasttab.com/online/mayuri-indian-restaurant-390-elden-street" target="_blank" rel="noopener noreferrer">Start Order</a>
+            <a class="order-fallback__link" href="https://order.toasttab.com/online/mayuri-indian-restaurant-390-elden-street">Open in this tab</a>
+          </div>
+        </div>
+      </div>
+    </main>
+    <div id="site-footer"></div>
+    <script src="assets/js/layout.js" defer></script>
+    <script>
+      (function () {
+        const iframe = document.getElementById("order-iframe");
+        const fallback = document.getElementById("order-fallback");
+        const loading = document.getElementById("order-loading");
+        let loaded = false;
+
+        iframe.addEventListener("load", () => {
+          loaded = true;
+          loading.style.display = "none";
+        });
+
+        setTimeout(() => {
+          if (!loaded) {
+            iframe.style.display = "none";
+            fallback.classList.add("is-visible");
+            loading.style.display = "none";
+          }
+        }, 1500);
+      })();
+    </script>
+  </body>
+</html>

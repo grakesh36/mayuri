@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Order Online — Mayuri Indian Restaurant</title>
+        <link rel="icon" href="images/Mayuri_logo.png" type="image/png" />
+<link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div id="site-header"></div>
+    <main>
+      <section class="section section--menu">
+        <div class="section__head">
+          <h2>Order Online</h2>
+          <p>Browse our full menu and place your order securely powered by Toast.</p>
+        </div>
+        <div class="menu-fallback" id="menu-fallback">
+          <p>If the menu doesn’t load here, open it in a new tab.</p>
+          <a class="btn btn--primary" href="https://order.toasttab.com/online/mayuri-indian-restaurant-390-elden-street" target="_blank" rel="noopener noreferrer">Open Online Ordering</a>
+        </div>
+        <div class="menu-loading" id="menu-loading">Loading online ordering…</div>
+        <div class="menu-frame" id="menu-frame">
+          <iframe
+            id="menu-iframe"
+            src="https://order.toasttab.com/online/mayuri-indian-restaurant-390-elden-street"
+            title="Order Online from Mayuri Indian Restaurant"
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allow="payment *; clipboard-write"
+          ></iframe>
+        </div>
+      </section>
+    </main>
+    <div id="site-footer"></div>
+    <script src="assets/js/layout.js" defer></script>
+    <script>
+      (function () {
+        const iframe = document.getElementById("menu-iframe");
+        const frame = document.getElementById("menu-frame");
+        const fallback = document.getElementById("menu-fallback");
+        const loading = document.getElementById("menu-loading");
+        let loaded = false;
+
+        if (!iframe) return;
+
+        iframe.addEventListener("load", () => {
+          loaded = true;
+          loading.style.display = "none";
+          fallback.classList.remove("is-visible");
+        });
+
+        setTimeout(() => {
+          if (!loaded) {
+            frame.style.display = "none";
+            loading.style.display = "none";
+            fallback.classList.add("is-visible");
+          }
+        }, 1500);
+      })();
+    </script>
+  </body>
+</html>
